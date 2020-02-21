@@ -21,7 +21,7 @@ const PostSchema = new Schema({
     type: String
   },
   likes: [
-    //This will be an array of user objects that will have ids
+    //This will be an array of user objects that will have users ids and like ids in them
     {
       //This way we know which likes came from which user. A single user can only like a certain post once
       user: {

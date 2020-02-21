@@ -121,4 +121,70 @@ router.delete('/:id', auth, async (req, res) => {
   }
 });
 
+// @route   PUT api/posts/like/:id
+// @desc    Like a post
+// @access  Private
+// PUT request because we technically updating a post. We need to know the id of the post that is being liked. When a
+// post is liked, we add the user that liked it to the likes array of the post.
+router.put('/like/:id', auth, async (req, res) => {
+  try {
+    //fetch the post from the DB here
+    const post = await Post.findById(req.params.id);
+
+    // Check if the post has already been liked by this user
+    if (
+      //filter only returns something if the function evaluates to true. If the length of the returned thing is <0 it means there is already a like for that user.
+      post.likes.filter(like => like.user.toString() === req.user.id).length > 0
+    ) {
+      return res.status(400).json({ msg: 'Post already liked' });
+    }
+    //If the user hasn't already liked the post then we want to take the post's likes and add the like to it. Unshift just adds the item to the front of the array. We are passing in a 'user' object that contains the user's ID because that is what the post schema demands.
+    post.likes.unshift({ user: req.user.id });
+
+    //actually saves the changes to the post object back into the database.
+    await post.save();
+
+    //we're returning an array of all of the likes for the post because the frontend logic requires it.
+    res.json(post.likes);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server Error');
+  }
+});
+
+// @route   PUT api/posts/unlike/:id
+// @desc    Unlike a post
+// @access  Private
+router.put('/unlike/:id', auth, async (req, res) => {
+  try {
+    //fetch the post from the DB here
+    const post = await Post.findById(req.params.id);
+
+    // Check if the post has already been liked by this user because we can't unlike a post that we havn't already liked
+    if (
+      //filter only returns something if the function evaluates to true. If the length of the returned things is 0, it means nothing was rteurned that passed the criteria function so there is already a like for that user.
+      post.likes.filter(like => like.user.toString() === req.user.id).length ===
+      0
+    ) {
+      return res.status(400).json({ msg: 'Post has not yet been liked' });
+    }
+    //If the user has already liked the post then we want to take the post's likes and remove the like from it.
+    //Get remove index (similar to what we did with experience and education) AKA get the correct like to remove
+    const removeIndex = post.likes //map means return a new array with the results of calling the provided functin on every element in the calling array. So that means it returns a list of the like's user's ids
+      .map(like => like.user.toString())
+      .indexOf(req.user.id); //.indexOf will find the index in the array of the item that matches req.user.id which is the logged in user that came from the auth middleware.
+    //Now we need to splice this like to remove out of the likes array at position removeIndex
+    post.likes.splice(removeIndex, 1);
+
+    //actually saves the changes to the post object back into the database.
+    await post.save();
+
+    //we're returning an array of all of the likes for the post because the frontend logic requires it.
+    res.json(post.likes);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server Error');
+  }
+});
+
 module.exports = router;
