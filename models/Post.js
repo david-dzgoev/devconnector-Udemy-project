@@ -31,9 +31,8 @@ const PostSchema = new Schema({
     }
   ],
   comments: [
-    //This will be an array of user objects that will have ids
     {
-      //This way we know which comments came from which user.
+      //Having the user object here allows us to know which comments came from which user.
       user: {
         type: Schema.Types.ObjectId,
         ref: 'users'

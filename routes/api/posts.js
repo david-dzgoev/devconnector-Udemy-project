@@ -187,4 +187,100 @@ router.put('/unlike/:id', auth, async (req, res) => {
   }
 });
 
+// @route   POST api/posts/comment/:id
+// @desc    Comment on a post
+// @access  Private
+router.post(
+  '/comment/:id',
+  [
+    auth,
+    [
+      check('text', 'Text is required')
+        .not()
+        .isEmpty()
+    ]
+  ],
+  async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    try {
+      //The reason we're getting the user is so that we can get the name, the avatar, and the user itself. The model of the post has a user itself in the post, we also need to name and avatar. These fields are going to come from the DB as it is not something we are sending with the request.
+      //We don't want to send the password back so do the .select
+      const user = await User.findById(req.user.id).select('-password');
+
+      //get the post from the post's id in the request
+      const post = await Post.findById(req.params.id);
+
+      //new object for a comment
+      const newComment = {
+        text: req.body.text,
+        //the rest of this stuff comes from the user
+        name: user.name,
+        avatar: user.avatar,
+        //user object in post model is a user's id
+        user: req.user.id
+      };
+
+      //Now we can add this comment to the post's comments array
+      post.comments.unshift(newComment);
+
+      await post.save();
+
+      //send back all the comments
+      res.json(post.comments);
+    } catch (err) {
+      console.error(err.message);
+      res.status(500).send('Server Error');
+    }
+  }
+);
+
+// @route   DELETE api/posts/comment/:id/:comment_id
+// @desc    Delete comment on a post
+// @access  Private
+router.delete('/comment/:id/:comment_id', auth, async (req, res) => {
+  try {
+    //get the post from the post's id in the request
+    const post = await Post.findById(req.params.id);
+
+    //Get the comment from the post with the comment's id in the request.
+    //The find method takes in a function like forEach, map, filter, etc. It only returns only one element if it passes the function so this will give us either the comment if it exists, or false.
+    const comment = post.comments.find(
+      comment => comment.id === req.params.comment_id
+    );
+
+    //make sure comment exists
+    if (!comment) {
+      return res.status(404).json({ msg: 'Comment does not exist' });
+    }
+
+    //We need to make sure that the user deleting the comment is the user that made the comment
+    if (comment.user.toString() !== req.user.id) {
+      return res.status(401).json({ msg: 'User not authorized' });
+    }
+    //if everything is ok lets move along
+    //We want to find the index
+
+    //If the user has already comented on the post then we want to take the post's comment and remove the comment from it.
+    //Get remove index (similar to what we did with experience and education) AKA get the correct comment to remove
+    const removeIndex = post.likes //map means return a new array with the results of calling the provided functin on every element in the calling array. So that means it returns a list of the comments's user's ids
+      .map(comment => comment.user.toString())
+      .indexOf(req.user.id); //.indexOf will find the index in the array of the item that matches req.user.id which is the logged in user that came from the auth middleware.
+    //Now we need to splice this like to remove out of the likes array at position removeIndex
+    post.comments.splice(removeIndex, 1);
+
+    //actually saves the changes to the post object back into the database.
+    await post.save();
+
+    //we're returning an array of all of the comments for the post because the frontend logic requires it.
+    res.json(post.comments);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server Error');
+  }
+});
+
 module.exports = router;
