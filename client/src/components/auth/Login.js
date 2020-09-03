@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 export const Login = () => {
   //formData is basically an object with all of our state values
   //setFormData is a function to update the state
+  //For default state values you put 'em in the useState
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -11,10 +12,12 @@ export const Login = () => {
 
   const { email, password } = formData;
 
-  //...formData is spread operator that just copies what is in there.
+  //in setFormData we want to change the state above. So we pass in an object with a copy of formData using spread operator to make a copy of it because we only want to change one thing.
+  //...formData is spread operator that just copies what is in there. Since we pass in the name and its value again after copying the name is already, the second piece in the object overwrites the first piece
   const onChange = (e) =>
     setFormData({ ...formData, [e.target.name]: e.target.value });
 
+  //We need to preventDefault because it is submit
   const onSubmit = async (e) => {
     e.preventDefault();
     console.log('SUCCESS');

@@ -3,8 +3,9 @@ import { Link } from 'react-router-dom';
 //import axios from 'axios'; (commented out because don't need it since we'll be doing this with redux action later on.)
 
 export const Register = () => {
-  //formData is basically an object with all of our state values
-  //setFormData is a function to update the state
+  //formData/first thing here is basically the state/an object with all of our state values
+  //setFormData/second thing here is basically this.setState/a function to update the state
+  //For default state values you put 'em in the useState
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -14,17 +15,20 @@ export const Register = () => {
 
   const { name, email, password, password2 } = formData;
 
-  //...formData is spread operator that just copies what is in there.
+  //in setFormData we want to change the state above. So we pass in an object with a copy of formData using spread operator to make a copy of it because we only want to change one thing.
+  //...formData is spread operator that just copies what is in there. Since we pass in the name and its value again after copying the name is already, the second piece in the object overwrites the first piece
   const onChange = (e) =>
     setFormData({ ...formData, [e.target.name]: e.target.value });
 
+  //We need to preventDefault because it is submit
   const onSubmit = async (e) => {
     e.preventDefault();
     if (password !== password2) {
       console.log('Passwords do not match');
     } else {
       console.log('SUCCESS');
-      //The below code is commented out because we will be doing it with a redux action later on:
+      //The below code is commented out because we will be doing it with a redux action later on rather than inside the component:
+      //Redux is app level data that holds user data, profile data, and alerts. Think of it as a cloud of data (the store) that hovers over your app where you can access or udpate the data from anywhere. Once you make a call to the DB and get a response back, you submit an action based on the response to the reducer which decides how and what to update and then the reducer rains the data down into the components automatically. We can call the redux actions from any component.
       //   //create new user object that uses the component's state data
       //   const newUser = {
       //     name: name,
@@ -60,6 +64,7 @@ export const Register = () => {
       </p>
       <form className='form' onSubmit={(e) => onSubmit(e)}>
         <div className='form-group'>
+          {/*We want to associate this name input with the name in the state */}
           <input
             type='text'
             placeholder='Name'
