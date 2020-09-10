@@ -1,8 +1,11 @@
 import React, { Fragment, useState } from 'react';
+import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
+import { setAlert } from '../../actions/alert';
+import PropTypes from 'prop-types';
 //import axios from 'axios'; (commented out because don't need it since we'll be doing this with redux action later on.)
 
-export const Register = () => {
+export const Register = ({ setAlert }) => {
   //formData/first thing here is basically the state/an object with all of our state values
   //setFormData/second thing here is basically this.setState/a function to update the state
   //For default state values you put 'em in the useState
@@ -24,7 +27,8 @@ export const Register = () => {
   const onSubmit = async (e) => {
     e.preventDefault();
     if (password !== password2) {
-      console.log('Passwords do not match');
+      //msg,             alertType
+      setAlert('Passwords do not match', 'danger');
     } else {
       console.log('SUCCESS');
       //The below code is commented out because we will be doing it with a redux action later on rather than inside the component:
@@ -117,4 +121,10 @@ export const Register = () => {
   );
 };
 
-export default Register;
+Register.propTypes = {
+  setAlert: PropTypes.func.isRequired,
+};
+//connect method (which connects this component to Redux) takes in two things:
+//First is any state you want to map. The second is an object with any action you want to use which allows you to do props dot that action.
+//We have to add the setAlert action in the export in order to be able to use it in the component, and then it is available in props.
+export default connect(null, { setAlert })(Register);

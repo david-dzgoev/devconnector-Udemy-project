@@ -12,6 +12,7 @@ const initialState = [
 ];
 
 //the action is going to contain a mandatory type, and a payload which will be the data. Sometimes you will have no data. The type is what we need to evaluate/switch on.
+//state is set to = initialState by default if there is no other argument
 export default function (state = initialState, action) {
   const { type, payload } = action;
 
@@ -23,7 +24,7 @@ export default function (state = initialState, action) {
     //Here we want to remove a specific alert by its ID:
     case REMOVE_ALERT:
       //payload in this case will just be the id.
-      //filter here will return all alerts except for those whose id matches the payload.
+      //filter here will return all alerts except for those whose id matches the payload. In other words, this removes any entries in the alert redux state that have the same ID as the ID passed into this REMOVE_ALERT case from the setAlert action. Then it returns that state.
       return state.filter((alert) => alert.id !== payload);
     default:
       return state;
