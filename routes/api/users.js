@@ -11,17 +11,16 @@ const User = require('../../models/User');
 // @route   POST api/users
 // @desc    Register user
 // @access  Public
+// @returns Happy Path: Newly created JWT
 router.post(
   '/',
   [
-    check('name', 'Name is required')
-      .not()
-      .isEmpty(),
+    check('name', 'Name is required').not().isEmpty(),
     check('email', 'Please include a valid email').isEmail(),
     check(
       'password',
       'Please enter a password with 6 or more characters'
-    ).isLength({ min: 6 })
+    ).isLength({ min: 6 }),
   ],
   async (req, res) => {
     const errors = validationResult(req);
@@ -45,14 +44,14 @@ router.post(
       const avatar = gravatar.url(email, {
         s: '200',
         r: 'pg',
-        d: 'mm'
+        d: 'mm',
       });
 
       user = new User({
         name,
         email,
         avatar,
-        password
+        password,
       });
 
       // Encrypt password using bcrypt
@@ -60,13 +59,14 @@ router.post(
       //creates a password hash
       user.password = await bcrypt.hash(password, salt);
 
+      //Save the user in the database. This apparently adds the dot id to this user object (the id automatically created by Mongo).
       await user.save();
 
       // Create payload that contains user's id
       const payload = {
         user: {
-          id: user.id
-        }
+          id: user.id,
+        },
       };
 
       //Return jsonwebtoken adding the payload that contains the user's id.
@@ -74,6 +74,7 @@ router.post(
       jwt.sign(
         payload,
         config.get('jwtSecret'),
+        //In production it should be 3600 for one hour
         { expiresIn: 360000 },
         (err, token) => {
           if (err) throw err;

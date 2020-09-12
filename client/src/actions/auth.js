@@ -17,11 +17,12 @@ export const register = ({ name, email, password }) => async (dispatch) => {
   const body = JSON.stringify({ name, email, password });
 
   try {
+    //Call the register a user route. res will contain a token if the call is successful
     const res = await axios.post('/api/users', body, config);
 
     dispatch({
       type: REGISTER_SUCCESS,
-      //res.data here because this request gives back a token on a successful reponse.
+      //res.data here because this request gives back a token on a successful reponse. I think payload is an oject of { token: ewrer42342etc} here.
       payload: res.data,
     });
     //If there is an error making /api/users request, remember that we get back an array of errors. So we want to loop through those.
