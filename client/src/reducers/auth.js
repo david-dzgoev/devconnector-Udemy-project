@@ -1,4 +1,11 @@
-import { REGISTER_SUCCESS, REGISTER_FAIL } from '../actions/types';
+import {
+  REGISTER_SUCCESS,
+  REGISTER_FAIL,
+  USER_LOADED,
+  AUTH_ERROR,
+  LOGIN_SUCCESS,
+  LOGIN_FAIL,
+} from '../actions/types';
 
 //initialState is going to be an object instead of an array like in alert
 const initialState = {
@@ -20,11 +27,22 @@ export default function (state = initialState, action) {
   const { type, payload } = action;
 
   switch (type) {
+    //token was validated and we got the user so we send the user in the payload here
+    case USER_LOADED:
+      return {
+        ...state,
+        //token was validated and we got the user
+        isAuthenticated: true,
+        loading: false,
+        //payload is the user
+        user: payload,
+      };
     //This means we successfully got the token back and we want to the user to be logged in right away
     case REGISTER_SUCCESS:
+    case LOGIN_SUCCESS:
       //We want to put the token that is returned inside local storage. It's payload.token here because payload is an object.
       localStorage.setItem('token', payload.token);
-      //The state we want to return has whatever is currently in the state, also we are going to return the payload. Set isAuthenticated to true and loading set to false because REGISTER_SUCCESS means we got a response.
+      //The state we want to return has whatever is currently in the state, also we are going to return the payload. Set isAuthenticated to true and loading set to false because these cases mean we got a response.
       return {
         //get whatever is currently in the state
         ...state,
@@ -33,8 +51,12 @@ export default function (state = initialState, action) {
         isAuthenticated: true,
         loading: false,
       };
+    //These cases clear all the auth related app state, and it clears the token from local storage. Baiscally we do not want to have a token that is invalid in local storage ever.
     case REGISTER_FAIL:
-      //If failed login we want to remove the token completely form local storage.
+    case AUTH_ERROR:
+    case LOGIN_FAIL:
+      //If registration or logging in fails, we want to remove the token completely form local storage and from the app state.
+      //If there is no token in local storage when a User is attempted to be loaded, we want to remove the token completely form local storage and from the app state.
       localStorage.removeItem('token');
       //We return a state
       return {

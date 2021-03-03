@@ -11,7 +11,7 @@ const User = require('../../models/User');
 // @route   GET api/auth
 // @desc    Get authenticated user
 // @access  Private
-//This route basically allows to see if we're logged in or not, and if so, get the user's data back.
+//This route basically checks to see if we're logged in or not by validating the token, and if so, get the user's data back.
 //auth middleware validates the token, and if valid, puts the user ID into the token.
 router.get('/', auth, async (req, res) => {
   //If I have my token and I hit this route, I get back all of the user data.
@@ -29,7 +29,7 @@ router.get('/', auth, async (req, res) => {
 });
 
 // @route   POST api/auth
-// @desc    Authenticate user & get token
+// @desc    Authenticate/login user & get token
 // @access  Public
 router.post(
   '/',

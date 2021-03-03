@@ -1,12 +1,12 @@
 import React, { Fragment, useState } from 'react';
 import { connect } from 'react-redux';
-import { Link } from 'react-router-dom';
+import { Link, Redirect } from 'react-router-dom';
 import { setAlert } from '../../actions/alert';
 import { register } from '../../actions/auth';
 import PropTypes from 'prop-types';
 //import axios from 'axios'; (commented out because don't need it since we'll be doing this with redux action later on.)
 
-export const Register = ({ setAlert, register }) => {
+export const Register = ({ setAlert, register, isAuthenticated }) => {
   //formData/first thing here is basically the state/an object with all of our state values
   //setFormData/second thing here is basically this.setState/a function to update the state
   //For default state values you put 'em in the useState
@@ -61,6 +61,12 @@ export const Register = ({ setAlert, register }) => {
       // }
     }
   };
+
+  // Redirect if logged in
+  if (isAuthenticated) {
+    //React router allows you to do Redirect and add a 'to' prop
+    return <Redirect to='/dashboard' />;
+  }
 
   return (
     <Fragment>
@@ -126,8 +132,19 @@ export const Register = ({ setAlert, register }) => {
 Register.propTypes = {
   setAlert: PropTypes.func.isRequired,
   register: PropTypes.func.isRequired,
+  isAuthenticated: PropTypes.bool,
 };
+
+//mapStateToProps gets called here with the app level state as an argument.
+const mapStateToProps = (state) => ({
+  //This would give us all of the state in the auth reducer:
+  //auth: state.auth
+
+  //isAuthenticated is a prop here.
+  isAuthenticated: state.auth.isAuthenticated,
+});
+
 //connect method (which connects this component to Redux) takes in two things:
 //First is any state you want to map. The second is an object with any action you want to use which allows you to do props dot that action.
 //We have to add the setAlert action in the export in order to be able to use it in the component, and then it is available in props.
-export default connect(null, { setAlert, register })(Register);
+export default connect(mapStateToProps, { setAlert, register })(Register);

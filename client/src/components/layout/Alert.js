@@ -25,6 +25,7 @@ Alert.propTypes = {
 //We actually want to get the alert state (the redux state we see in redux devTools for alert) into this component. We are mapping the redux state to this component's props (just 'alerts' here, not props.alerts) so that we have access to it. What "it" is in this case, is an array of alert objects:
 const mapStateToProps = (state) => ({
   //it's actually state dot whatever reducer we want from the Root Reducer (aka index.js in reducer folder)
+  //alerts is a prop here.
   alerts: state.alert,
 });
 
