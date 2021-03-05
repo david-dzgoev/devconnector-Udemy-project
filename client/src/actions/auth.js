@@ -8,6 +8,7 @@ import {
   AUTH_ERROR,
   LOGIN_SUCCESS,
   LOGIN_FAIL,
+  LOGOUT,
 } from './types';
 import setAuthToken from '../utils/setAuthToken';
 
@@ -118,4 +119,12 @@ export const login = (email, password) => async (dispatch) => {
       //We only need to dispatch the type - we don't need a payload because LOGIN_FAIL doesn't do anything with the payload.
     });
   }
+};
+
+// Logout / Clear Profile
+//We're just going to clear everything including the profile, which we havn't dealt with yet at this point
+export const logout = () => (dispatch) => {
+  dispatch({
+    type: LOGOUT,
+  });
 };

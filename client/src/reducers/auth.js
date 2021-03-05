@@ -5,6 +5,7 @@ import {
   AUTH_ERROR,
   LOGIN_SUCCESS,
   LOGIN_FAIL,
+  LOGOUT,
 } from '../actions/types';
 
 //initialState is going to be an object instead of an array like in alert
@@ -51,11 +52,12 @@ export default function (state = initialState, action) {
         isAuthenticated: true,
         loading: false,
       };
-    //These cases clear all the auth related app state, and it clears the token from local storage. Baiscally we do not want to have a token that is invalid in local storage ever.
+    //These cases clear all the auth related app state, and it clears the token from local storage. Basically we do not want to have a token that is invalid in local storage ever.
     case REGISTER_FAIL:
     case AUTH_ERROR:
     case LOGIN_FAIL:
-      //If registration or logging in fails, we want to remove the token completely form local storage and from the app state.
+    case LOGOUT:
+      //If registration or logging in fails, or we want to logout, we want to remove the token completely form local storage and from the app state.
       //If there is no token in local storage when a User is attempted to be loaded, we want to remove the token completely form local storage and from the app state.
       localStorage.removeItem('token');
       //We return a state
