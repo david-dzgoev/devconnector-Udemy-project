@@ -3,6 +3,7 @@
 import { combineReducers } from 'redux';
 import alert from './alert';
 import auth from './auth';
+import profile from './profile';
 
 //combineReducers just takes in an object that will have any reducers that we create.
-export default combineReducers({ alert, auth });
+export default combineReducers({ alert, auth, profile });
