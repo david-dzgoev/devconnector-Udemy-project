@@ -1,4 +1,4 @@
-import { GET_PROFILE, PROFILE_ERROR } from '../actions/types';
+import { GET_PROFILE, PROFILE_ERROR, CLEAR_PROFILE } from '../actions/types';
 
 //We're gonna have actions to get the profile, create it, update it, clear it from the state, etc.
 const initialState = {
@@ -29,6 +29,13 @@ export default function (state = initialState, action) {
         //Set the error object as the payload which is any errors that were passed into the GET_PROFILE action
         error: payload,
         loading: false,
+      };
+    case CLEAR_PROFILE:
+      return {
+        ...state,
+        //Set profile back to null. Also set the repos to null because the profile could have repos.
+        profile: null,
+        repos: null,
       };
     default:
       return state;
