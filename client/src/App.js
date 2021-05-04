@@ -6,6 +6,7 @@ import Register from './components/auth/Register';
 import Login from './components/auth/Login';
 import Alert from './components/layout/Alert';
 import Dashboard from './components/dashboard/Dashboard';
+import CreateProfile from './components/profile-forms/CreateProfile';
 import PrivateRoute from './components/routing/PrivateRoute';
 //Redux stuff:
 //Provider comes from React. Redux is separate than React but the Provider combines them together by wrapping entire app with Provider.
@@ -43,9 +44,14 @@ const App = () => {
             <Switch>
               <Route exact path='/register' component={Register} />
               <Route exact path='/login' component={Login} />
-              //Any route we want the user to be logged in for, we can use the
+              // Any route we want the user to be logged in for, we can use the
               PrivateRoute instead of Route here:
               <PrivateRoute exact path='/dashboard' component={Dashboard} />
+              <PrivateRoute
+                exact
+                path='/create-profile'
+                component={CreateProfile}
+              />
             </Switch>
           </section>
         </Fragment>
