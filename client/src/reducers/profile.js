@@ -1,4 +1,9 @@
-import { GET_PROFILE, PROFILE_ERROR, CLEAR_PROFILE } from '../actions/types';
+import {
+  GET_PROFILE,
+  PROFILE_ERROR,
+  CLEAR_PROFILE,
+  UPDATE_PROFILE
+} from '../actions/types';
 
 //We're gonna have actions to get the profile, create it, update it, clear it from the state, etc.
 const initialState = {
@@ -9,33 +14,35 @@ const initialState = {
   repos: [],
   loading: true,
   //For any errors in the request:
-  error: {},
+  error: {}
 };
 
 export default function (state = initialState, action) {
   const { type, payload } = action;
 
   switch (type) {
+    //Fill the profile state
     case GET_PROFILE:
+    case UPDATE_PROFILE:
       return {
         ...state,
         //Set the profile as the payload which is the user's profile that was passed into the GET_PROFILE action
         profile: payload,
-        loading: false,
+        loading: false
       };
     case PROFILE_ERROR:
       return {
         ...state,
         //Set the error object as the payload which is any errors that were passed into the GET_PROFILE action
         error: payload,
-        loading: false,
+        loading: false
       };
     case CLEAR_PROFILE:
       return {
         ...state,
         //Set profile back to null. Also set the repos to null because the profile could have repos.
         profile: null,
-        repos: null,
+        repos: null
       };
     default:
       return state;
