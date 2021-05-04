@@ -1,12 +1,18 @@
-import React, { Fragment, useState } from 'react';
+import React, { Fragment, useState, useEffect } from 'react';
 import { Link, withRouter } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import { createProfile } from '../../actions/profile';
+import { createProfile, getCurrentProfile } from '../../actions/profile';
 
 //We get the history object by doing props.history
-const CreateProfile = ({ createProfile, history }) => {
+//From the profile state, we need profile and loading so destructure those here:
+const EditProfile = ({
+  profile: { profile, loading },
+  createProfile,
+  getCurrentProfile,
+  history
+}) => {
   const [formData, setFormData] = useState({
     company: '',
     website: '',
@@ -24,6 +30,28 @@ const CreateProfile = ({ createProfile, history }) => {
 
   //default value will be false:
   const [displaySocialInputs, toggleSocialInputs] = useState(false);
+
+  useEffect(() => {
+    //fetch current profile and pass it down through the state:
+    getCurrentProfile();
+    //Set formData and set it with the current profile values. We have to actually check to make sure if its loading or theres no profile, then have a blank field, if it's not loading and there is a profile, then fill it with profile.company.
+    //useEffect will keep reloading on whatever is passed into the array in the second argument to useEffect so if loading changes, useEffect will run:
+    setFormData({
+      company: loading || !profile.company ? '' : profile.company,
+      website: loading || !profile.website ? '' : profile.website,
+      location: loading || !profile.location ? '' : profile.location,
+      status: loading || !profile.status ? '' : profile.status,
+      skills: loading || !profile.skills ? '' : profile.skills.join(','),
+      githubusername:
+        loading || !profile.githubusername ? '' : profile.githubusername,
+      bio: loading || !profile.bio ? '' : profile.bio,
+      twitter: loading || !profile.social ? '' : profile.social.twitter,
+      facebook: loading || !profile.social ? '' : profile.social.facebook,
+      linkedin: loading || !profile.social ? '' : profile.social.linkedin,
+      youtube: loading || !profile.social ? '' : profile.social.youtube,
+      instagram: loading || !profile.social ? '' : profile.social.instagram
+    });
+  }, [loading]);
 
   const {
     company,
@@ -45,7 +73,7 @@ const CreateProfile = ({ createProfile, history }) => {
 
   const onSubmit = (e) => {
     e.preventDefault();
-    createProfile(formData, history);
+    createProfile(formData, history, true);
   };
 
   return (
@@ -223,9 +251,17 @@ const CreateProfile = ({ createProfile, history }) => {
   );
 };
 
-CreateProfile.propTypes = {
-  createProfile: PropTypes.func.isRequired
+EditProfile.propTypes = {
+  createProfile: PropTypes.func.isRequired,
+  getCurrentProfile: PropTypes.func.isRequired,
+  profile: PropTypes.object.isRequired
 };
 
-//If we want to be able to get history from props.history to be able to redirect in the action, we need to wrap CreateProfile component in withRouter:
-export default connect(null, { createProfile })(withRouter(CreateProfile));
+const mapStateToProps = (state) => ({
+  profile: state.profile
+});
+
+//If we want to be able to get history from props.history to be able to redirect in the action, we need to wrap EditProfile component in withRouter:
+export default connect(mapStateToProps, { createProfile, getCurrentProfile })(
+  withRouter(EditProfile)
+);

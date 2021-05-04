@@ -5,13 +5,14 @@ import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Spinner from '../layout/Spinner';
+import DashboardActions from './DashboardActions';
 import { getCurrentProfile } from '../../actions/profile';
 
 //We want to call getCurrentProfile as soon as this component loads. Use useEffect hooks to do something on component load, and pass in empty brackets to do it only one time.
 const Dashboard = ({
   getCurrentProfile,
   auth: { user },
-  profile: { profile, loading },
+  profile: { profile, loading }
 }) => {
   useEffect(() => {
     getCurrentProfile();
@@ -27,7 +28,9 @@ const Dashboard = ({
         <i className='fas fa-user' /> Welcome {user && user.name}
       </p>
       {profile !== null ? (
-        <Fragment>has</Fragment>
+        <Fragment>
+          <DashboardActions />
+        </Fragment>
       ) : (
         //What do we do if person does not have a profile:
         <Fragment>
@@ -44,12 +47,12 @@ const Dashboard = ({
 Dashboard.propTypes = {
   getCurrentProfile: PropTypes.func.isRequired,
   auth: PropTypes.object.isRequired,
-  profile: PropTypes.object.isRequired,
+  profile: PropTypes.object.isRequired
 };
 
 const mapStateToProps = (state) => ({
   auth: state.auth,
-  profile: state.profile,
+  profile: state.profile
 });
 
 export default connect(mapStateToProps, { getCurrentProfile })(Dashboard);
